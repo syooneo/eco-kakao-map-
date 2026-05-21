@@ -38,7 +38,7 @@
             box-shadow: 2px 0 10px rgba(0,0,0,0.05);
         }
 
-        /* 상단 타이틀 영역 (한 줄 소개 적용) */
+        /* 상단 타이틀 영역 */
         .info-header {
             padding: 20px;
             background-color: #2ecc71;
@@ -54,7 +54,7 @@
             line-height: 1.4;
         }
 
-        /* 가로 정렬로 예쁘게 정돈된 검색창 및 탭 영역 */
+        /* 검색창 및 탭 영역 */
         .search-box {
             padding: 15px;
             background-color: #fff;
@@ -110,7 +110,7 @@
             font-weight: bold;
             background-color: #f1f2f6;
             border: 1px solid #ced6e0;
-            border-radius: 20px; /* 트렌디한 알약 모양 탭 버튼 */
+            border-radius: 20px; /* 알약 모양 탭 버튼 */
             cursor: pointer;
             transition: all 0.2s;
         }
@@ -250,7 +250,7 @@
         let centerMarker = null;
         let centerCircle = null;
 
-        // 안전한 지도 초기화 (진입 시 팝업 없이 즉시 로드)
+        // 지도 즉시 초기화 (팝업 관련 코드 전면 삭제)
         kakao.maps.load(function() {
             const mapContainer = document.getElementById('map'); 
             const defaultPosition = new kakao.maps.LatLng(37.5546788, 126.9706069); // 기본 서울역
@@ -260,29 +260,27 @@
             geocoder = new kakao.maps.services.Geocoder();
             infowindow = new kakao.maps.InfoWindow({zIndex:1});
 
-            // 초기 기준지 세팅
+            // 즉시 기본 위치로 세팅
             setBaseLocation(defaultPosition, "서울역 주변");
         });
 
-        // 하단 버튼 클릭 시 브라우저 내장 입력창(Prompt)으로 간단하게 지역 변경
+        // 브라우저 내장 입력창(Prompt)으로 안전하게 지역 변경
         function promptLocationChange() {
             const addrInput = prompt("탐색할 중심 지역명을 입력해 주세요!\n(예: 상도동, 분당구, 고양시 등)");
             
-            if (addrInput === null) return; // 취소 누른 경우
+            if (addrInput === null) return; 
             if (!addrInput.trim()) {
                 alert("지역명을 입력해 주세요!");
                 return;
             }
 
-            // 카카오Geocoder 주소 좌표 분석 가동
             geocoder.addressSearch(addrInput, function(result, status) {
                 if (status === kakao.maps.services.Status.OK) {
                     const targetLatLng = new kakao.maps.LatLng(result[0].y, result[0].x);
                     
-                    // 해당 좌표를 지도 기준지로 임명
                     setBaseLocation(targetLatLng, result[0].address_name);
                     
-                    // 동네 변경 성공 시 자동으로 첫 번째 가로 탭인 '생태통로' 스캔 작동
+                    // 성공 시 첫 번째 탭 자동 검색 기능 작동
                     searchCategory('생태통로', document.querySelector('.category-grid .category-btn'));
                 } else {
                     alert("주소를 찾지 못했습니다. 시, 구, 동 명칭을 정확히 입력해 주세요.");
@@ -290,7 +288,7 @@
             });
         }
 
-        // 탐색 기준 중심점 레이어 설정 및 5km 가시화
+        // 탐색 기준 중심점 및 5km 반경 가시화
         function setBaseLocation(latlng, addressName) {
             currentLatLng = latlng;
             map.setCenter(currentLatLng);
@@ -325,7 +323,6 @@
             infowindow.open(map, centerMarker);
         }
 
-        // 검색창 직접 타이핑용 함수
         function searchPlaces() {
             const keyword = document.getElementById('keyword').value;
             if (!keyword.trim()) {
@@ -336,7 +333,6 @@
             ps.keywordSearch(keyword, searchCB); 
         }
 
-        // 가로 카테고리 탭 작동 함수
         function searchCategory(keyword, element) {
             document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
             element.classList.add('active');
